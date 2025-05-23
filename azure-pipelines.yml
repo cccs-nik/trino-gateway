@@ -45,9 +45,6 @@ steps:
         $(BRANCH_NAME)
         $(BRANCH_NAME)_$(buildTimestamp)_b$(Build.BuildId)
       buildContext: .
-      buildArguments: |
-        JDK_VERSION=23
-        TRINO_GATEWAY_BASE_IMAGE=registry.access.redhat.com/ubi9/ubi-minimal:latest
 
   - task: Docker@2
     displayName: Push image

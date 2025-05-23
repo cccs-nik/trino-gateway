@@ -17,9 +17,8 @@ WORKDIR /build
 COPY . .
 RUN ./mvnw clean package -DskipTests
 
-ARG TRINO_GATEWAY_BASE_IMAGE
-FROM ${TRINO_GATEWAY_BASE_IMAGE} AS jdk-download
-ARG JDK_VERSION
+FROM registry.access.redhat.com/ubi9/ubi-minimal AS jdk-download
+ARG JDK_VERSION=23
 ENV JAVA_HOME="/usr/lib/jvm/jdk-${JDK_VERSION}"
 
 RUN \
@@ -30,7 +29,7 @@ RUN \
     mkdir -p "${JAVA_HOME}" && \
     curl -#LfS "https://api.adoptium.net/v3/binary/latest/${JDK_VERSION}/ga/linux/x64/jdk/hotspot/normal/eclipse" | tar -zx --strip 1 -C "${JAVA_HOME}"
 
-FROM ${TRINO_GATEWAY_BASE_IMAGE}
+FROM jdk-download
 WORKDIR /usr/lib/trino-gateway
 
 ARG JDK_VERSION
@@ -54,4 +53,4 @@ USER trino:trino
 CMD java -jar /usr/lib/trino-gateway/gateway-ha-jar-with-dependencies.jar "/etc/trino-gateway/config.yaml"
 
 HEALTHCHECK --interval=10s --timeout=5s --start-period=10s \
-  CMD /usr/lib/trino-gateway/bin/health-check
+    CMD /usr/lib/trino-gateway/bin/health-check
