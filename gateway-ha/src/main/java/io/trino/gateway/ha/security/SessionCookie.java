@@ -41,7 +41,6 @@ public final class SessionCookie
                 .comment("")
                 .maxAge(60 * 60 * 24)
                 .secure(true)
-                .httpOnly(true)
                 .sameSite(NONE)
                 .build();
 
