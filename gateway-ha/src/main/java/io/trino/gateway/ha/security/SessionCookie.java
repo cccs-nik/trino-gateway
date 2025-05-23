@@ -13,11 +13,16 @@
  */
 package io.trino.gateway.ha.security;
 
+import io.airlift.log.Logger;
 import jakarta.ws.rs.core.NewCookie;
 import jakarta.ws.rs.core.Response;
 
+import static jakarta.ws.rs.core.NewCookie.SameSite.NONE;
+
 public final class SessionCookie
 {
+    private static final Logger log = Logger.get(SessionCookie.class);
+
     static final String OAUTH_ID_TOKEN = "token";
     static final String SELF_ISSUER_ID = "self";
 
@@ -25,7 +30,10 @@ public final class SessionCookie
 
     public static NewCookie getTokenCookie(String token)
     {
-        return new NewCookie.Builder(OAUTH_ID_TOKEN)
+        log.error("Creating token cookie — length = {}, begins with = {}", 
+                 token.length(), 
+                 token.substring(0, Math.min(token.length(), 20)));
+        NewCookie cookie = new NewCookie.Builder(OAUTH_ID_TOKEN)
                 .value(token)
                 .path("/")
                 .domain("")
@@ -33,7 +41,13 @@ public final class SessionCookie
                 .maxAge(60 * 60 * 24)
                 .secure(true)
                 .httpOnly(false)
+                .sameSite(NONE)
                 .build();
+
+        log.error("Set-Cookie being built: name = {}, domain = {}, path = {}, secure = {}, sameSite = {}, httpOnly = {}, maxAge = {}",
+                cookie.getName(), cookie.getDomain(), cookie.getPath(), cookie.isSecure(), cookie.getSameSite(), cookie.isHttpOnly(), cookie.getMaxAge());
+
+        return cookie;
     }
 
     public static Response logOut()
