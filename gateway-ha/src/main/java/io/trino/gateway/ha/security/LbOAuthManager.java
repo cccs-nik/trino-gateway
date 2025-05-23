@@ -112,7 +112,7 @@ public class LbOAuthManager
 
         if (!tokenResponse.indicatesSuccess()) {
             HTTPResponse httpResponse = tokenResponse.toErrorResponse().toHTTPResponse();
-            log.error("OIDC token exchange failed — user = ???, code = {}, error = {}", code, httpResponse.getStatusCode(), httpResponse.getBody());
+            log.error("OIDC token exchange failed — user = ???, code = %s, error = %s", httpResponse.getStatusCode(), httpResponse.getBody());
             return buildUnauthorizedResponse();
         }
 
@@ -123,10 +123,10 @@ public class LbOAuthManager
                 .map(map -> map.get(NONCE_CLAIM_NAME))
                 .filter(nonceInClaim -> nonceInClaim.asString().equals(hashNonce(nonce)));
         if (result.isEmpty()) {
-            log.error("Nonce claim mismatch for token: {}", idToken);
+            log.error("Nonce claim mismatch for token: %s", idToken);
             return buildUnauthorizedResponse();
         }
-        log.info("Successfully exchanged token for user (claims: {})", getClaimsFromIdToken(idToken));
+        log.error("Successfully exchanged token for user (claims: %s)", getClaimsFromIdToken(idToken));
         return Response.status(FOUND)
                 .location(oauthConfig.getRedirectWebUrl().orElse(URI.create(redirectLocation)))
                 .cookie(SessionCookie.getTokenCookie(idToken))
