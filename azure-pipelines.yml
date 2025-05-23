@@ -26,9 +26,6 @@ steps:
       command: login
       containerRegistry: $(containerRegistry)
 
-  - script: $(MAVEN) clean package -DskipTests
-    displayName: Build with Maven
-
   - script: |
       VERSION=$(./mvnw help:evaluate -Dexpression=project.version -q -DforceStdout)
       echo "##vso[task.setvariable variable=trinoVersion]$VERSION"

@@ -12,6 +12,11 @@
 # limitations under the License.
 
 # syntax=docker/dockerfile:1
+FROM eclipse-temurin:23-jdk AS build
+WORKDIR /build
+COPY . .
+RUN ./mvnw clean package -DskipTests
+
 ARG TRINO_GATEWAY_BASE_IMAGE
 FROM ${TRINO_GATEWAY_BASE_IMAGE} AS jdk-download
 ARG JDK_VERSION
