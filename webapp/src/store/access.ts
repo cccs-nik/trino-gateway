@@ -55,10 +55,22 @@ export const useAccessStore = create<AccessControlStore>()(
         }
       },
       isAuthorized() {
-        get().getUserInfo();
-        return (
-          !!get().token
-        );
+        console.error("[isAuthorized] Checking authorization status...");
+
+        try {
+          console.error("[isAuthorized] Calling getUserInfo...");
+          get().getUserInfo();
+        } catch (err) {
+          console.error("[isAuthorized] getUserInfo threw an error:", err);
+        }
+
+        const token = get().token;
+        console.error("[isAuthorized] Token:", token);
+
+        const isAuth = !!token;
+        console.error("[isAuthorized] Returning:", isAuth);
+
+        return isAuth;
       },
       getUserInfo(force: boolean = false) {
         if ((!get().token) || (!force && fetchState > 0)) return;
@@ -66,7 +78,7 @@ export const useAccessStore = create<AccessControlStore>()(
         getInfoApi().then((data) => {
           set(() => ({ ...data }));
         }).catch(() => {
-          // console.error("[Config] failed to fetch config");
+          console.error("[Config] failed to fetch config");
         }).finally(() => {
           fetchState = 2;
         });
