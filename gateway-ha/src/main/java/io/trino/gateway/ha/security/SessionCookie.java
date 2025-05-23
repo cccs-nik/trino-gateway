@@ -30,9 +30,10 @@ public final class SessionCookie
 
     public static NewCookie getTokenCookie(String token)
     {
-        log.error("Creating token cookie — length = {}, begins with = {}",
+        log.error("Creating token cookie — length = %d, begins with = %s",
                  token.length(),
                  token.substring(0, Math.min(token.length(), 20)));
+
         NewCookie cookie = new NewCookie.Builder(OAUTH_ID_TOKEN)
                 .value(token)
                 .path("/")
@@ -44,7 +45,7 @@ public final class SessionCookie
                 .sameSite(NONE)
                 .build();
 
-        log.error("Set-Cookie being built: name = {}, domain = {}, path = {}, secure = {}, sameSite = {}, httpOnly = {}, maxAge = {}",
+        log.error("Set-Cookie being built: name = %s, domain = %s, path = %s, secure = %s, sameSite = %s, httpOnly = %s, maxAge = %d",
                 cookie.getName(), cookie.getDomain(), cookie.getPath(), cookie.isSecure(), cookie.getSameSite(), cookie.isHttpOnly(), cookie.getMaxAge());
 
         return cookie;
