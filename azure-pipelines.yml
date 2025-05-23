@@ -1,0 +1,70 @@
+trigger:
+  branches:
+    include:
+      - main
+
+resources:
+  - repo: self
+
+variables:
+  buildTimestamp: $[format('{0:yyyyMMddHHmmss}', pipeline.startTime)]
+  containerRegistry: uchimera
+  DOCKER_BUILDKIT: 1
+  MAVEN: './mvnw -B'
+
+pool: cybertron-build-pool
+
+steps:
+  - bash: |
+      BRANCH_NAME=`echo "$SYSTEM_PULLREQUEST_SOURCEBRANCH $BUILD_SOURCEBRANCH" | sed -r 's/^\s*(refs\/heads\/)?(\S*).*$/\2/' | sed 's/\//_/g'`
+      echo "##vso[task.setvariable variable=BRANCH_NAME]$BRANCH_NAME"
+    displayName: Parse Source Control Branch Name
+
+  - task: Docker@2
+    displayName: Login to $(containerRegistry)
+    inputs:
+      command: login
+      containerRegistry: $(containerRegistry)
+
+  - script: $(MAVEN) clean package -DskipTests
+    displayName: Build with Maven
+
+  - script: |
+      VERSION=$(./mvnw help:evaluate -Dexpression=project.version -q -DforceStdout)
+      echo "##vso[task.setvariable variable=trinoVersion]$VERSION"
+    displayName: Extract Trino Gateway Version
+
+  - task: Docker@2
+    displayName: Build Docker image
+    env:
+      DOCKER_BUILDKIT: 1
+      # Full logs for CI build
+      BUILDKIT_PROGRESS: plain
+    inputs:
+      command: build
+      repository: trinodb/trino-gateway
+      Dockerfile: docker/Dockerfile
+      tags: |
+        $(BRANCH_NAME)
+        $(BRANCH_NAME)_$(buildTimestamp)_b$(Build.BuildId)
+      buildContext: .
+      buildArguments: |
+        JDK_VERSION=23
+        TRINO_GATEWAY_BASE_IMAGE=registry.access.redhat.com/ubi9/ubi-minimal:latest
+
+  - task: Docker@2
+    displayName: Push image
+    inputs:
+      command: "push"
+      containerRegistry: $(containerRegistry)
+      repository: trinodb/trino-gateway
+      tags: |
+        $(BRANCH_NAME)
+        $(BRANCH_NAME)_$(buildTimestamp)_b$(Build.BuildId)
+
+  - task: Docker@2
+    displayName: Logout of $(containerRegistry)
+    inputs:
+      command: logout
+      containerRegistry: $(containerRegistry)
+    condition: always()

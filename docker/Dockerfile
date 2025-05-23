@@ -14,7 +14,6 @@
 # syntax=docker/dockerfile:1
 ARG TRINO_GATEWAY_BASE_IMAGE
 FROM ${TRINO_GATEWAY_BASE_IMAGE} AS jdk-download
-ARG JDK_DOWNLOAD_LINK
 ARG JDK_VERSION
 ENV JAVA_HOME="/usr/lib/jvm/jdk-${JDK_VERSION}"
 
@@ -22,9 +21,9 @@ RUN \
     set -xeuo pipefail && \
     microdnf install -y tar gzip && \
     # Install JDK from the provided archive link \
-    echo "Downloading JDK from ${JDK_DOWNLOAD_LINK}" && \
+    echo "Downloading JDK" && \
     mkdir -p "${JAVA_HOME}" && \
-    curl -#LfS "${JDK_DOWNLOAD_LINK}" | tar -zx --strip 1 -C "${JAVA_HOME}"
+    curl -#LfS "https://api.adoptium.net/v3/binary/latest/${JDK_VERSION}/ga/linux/x64/jdk/hotspot/normal/eclipse" | tar -zx --strip 1 -C "${JAVA_HOME}"
 
 FROM ${TRINO_GATEWAY_BASE_IMAGE}
 WORKDIR /usr/lib/trino-gateway
