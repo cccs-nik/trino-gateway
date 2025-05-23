@@ -47,7 +47,7 @@ RUN \
 WORKDIR /usr/lib/trino-gateway
 
 COPY --from=build /build/gateway-ha/target/gateway-ha-*-jar-with-dependencies.jar ./gateway-ha-jar-with-dependencies.jar
-COPY --from=build /build/bin ./bin
+COPY --from=build /build/docker/bin ./bin
 
 EXPOSE 8080
 USER trino:trino
