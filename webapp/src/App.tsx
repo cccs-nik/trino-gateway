@@ -36,9 +36,14 @@ function Screen() {
   const access = useAccessStore();
   useEffect(() => {
     const token = Cookies.get('token');
+    console.debug("[App.tsx] Cookie token:", token);
+
     if (token) {
       access.updateToken(token);
+      console.debug("[App.tsx] Token set via updateToken()");
       Cookies.remove('token');
+    } else {
+      console.warn("[App.tsx] No token found in cookies — likely login flow issue");
     }
   }, [])
   return (
