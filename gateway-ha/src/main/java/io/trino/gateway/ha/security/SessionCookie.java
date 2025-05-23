@@ -30,8 +30,8 @@ public final class SessionCookie
 
     public static NewCookie getTokenCookie(String token)
     {
-        log.error("Creating token cookie — length = {}, begins with = {}", 
-                 token.length(), 
+        log.error("Creating token cookie — length = {}, begins with = {}",
+                 token.length(),
                  token.substring(0, Math.min(token.length(), 20)));
         NewCookie cookie = new NewCookie.Builder(OAUTH_ID_TOKEN)
                 .value(token)
