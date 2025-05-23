@@ -17,7 +17,7 @@ WORKDIR /build
 COPY . .
 RUN ./mvnw clean package -DskipTests
 
-FROM registry.access.redhat.com/ubi9/ubi-minimal AS jdk-download
+FROM registry.access.redhat.com/ubi9/ubi-minimal AS jdk-setup
 ARG JDK_VERSION=23
 ENV JAVA_HOME="/usr/lib/jvm/jdk-${JDK_VERSION}"
 
@@ -29,13 +29,11 @@ RUN \
     mkdir -p "${JAVA_HOME}" && \
     curl -#LfS "https://api.adoptium.net/v3/binary/latest/${JDK_VERSION}/ga/linux/x64/jdk/hotspot/normal/eclipse" | tar -zx --strip 1 -C "${JAVA_HOME}"
 
-FROM jdk-download
-WORKDIR /usr/lib/trino-gateway
-
-ARG JDK_VERSION
+FROM registry.access.redhat.com/ubi9/ubi-minimal
+ARG JDK_VERSION=23
 ENV JAVA_HOME="/usr/lib/jvm/jdk-${JDK_VERSION}"
 ENV PATH=$PATH:$JAVA_HOME/bin
-COPY --from=jdk-download $JAVA_HOME $JAVA_HOME
+COPY --from=jdk-setup $JAVA_HOME $JAVA_HOME
 
 RUN \
     set -xeu && \
@@ -46,7 +44,10 @@ RUN \
     mkdir -p /usr/lib/trino-gateway /etc/trino-gateway && \
     chown -R "trino:trino" /usr/lib/trino-gateway /etc/trino-gateway
 
-COPY --chown=trino:trino gateway-ha /usr/lib/trino-gateway
+WORKDIR /usr/lib/trino-gateway
+
+COPY --from=build /build/gateway-ha/target/gateway-ha-*-jar-with-dependencies.jar ./gateway-ha-jar-with-dependencies.jar
+COPY --from=build /build/bin ./bin
 
 EXPOSE 8080
 USER trino:trino
