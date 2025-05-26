@@ -109,7 +109,7 @@ public class HaGatewayProviderModule
     {
         AuthenticationConfiguration authenticationConfiguration = configuration.getAuthentication();
         if (authenticationConfiguration != null && authenticationConfiguration.getOauth() != null) {
-            return new LbOAuthManager(authenticationConfiguration.getOauth(), configuration.getPagePermissions());
+            return new LbOAuthManager(authenticationConfiguration.getOauth(), configuration.getPagePermissions(), configuration.getAuthorization());
         }
         return null;
     }

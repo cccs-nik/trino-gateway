@@ -35,6 +35,7 @@ import com.nimbusds.openid.connect.sdk.Nonce;
 import com.nimbusds.openid.connect.sdk.OIDCTokenResponse;
 import com.nimbusds.openid.connect.sdk.OIDCTokenResponseParser;
 import io.airlift.log.Logger;
+import io.trino.gateway.ha.config.AuthorizationConfiguration;
 import io.trino.gateway.ha.config.OAuthConfiguration;
 import io.trino.gateway.ha.domain.Result;
 import jakarta.ws.rs.core.Response;
@@ -65,13 +66,15 @@ public class LbOAuthManager
      */
     private final OAuthConfiguration oauthConfig;
     private final Map<String, String> pagePermissions;
+    private final AuthorizationConfiguration authorizationConfig;
 
-    public LbOAuthManager(OAuthConfiguration configuration, Map<String, String> pagePermissions)
+    public LbOAuthManager(OAuthConfiguration configuration, Map<String, String> pagePermissions, AuthorizationConfiguration authorizationConfiguration)
     {
         this.oauthConfig = configuration;
         this.pagePermissions = pagePermissions.entrySet().stream()
                 .filter(entry -> entry.getValue() != null)
                 .collect(toImmutableMap(entry -> entry.getKey().toUpperCase(ENGLISH), Map.Entry::getValue));
+        this.authorizationConfig = authorizationConfig;
     }
 
     public String getUserIdField()
@@ -118,6 +121,8 @@ public class LbOAuthManager
 
         OIDCTokenResponse successResponse = (OIDCTokenResponse) tokenResponse.toSuccessResponse();
         String idToken = successResponse.getOIDCTokens().getIDToken().serialize();
+        log.error("Serialized idToken: %s, idToken: %s", idToken, successResponse.getOIDCTokens().getIDToken());
+        log.error("Admin groups: %s", this.authorizationConfig.getAdmin());
 
         Optional<Claim> result = getClaimsFromIdToken(idToken)
                 .map(map -> map.get(NONCE_CLAIM_NAME))
