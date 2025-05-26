@@ -38,6 +38,7 @@ import io.airlift.log.Logger;
 import io.trino.gateway.ha.config.AuthorizationConfiguration;
 import io.trino.gateway.ha.config.OAuthConfiguration;
 import io.trino.gateway.ha.domain.Result;
+import jakarta.ws.rs.core.NewCookie;
 import jakarta.ws.rs.core.Response;
 
 import java.io.IOException;
