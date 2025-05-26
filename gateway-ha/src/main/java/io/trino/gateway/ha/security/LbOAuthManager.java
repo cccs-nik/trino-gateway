@@ -74,7 +74,7 @@ public class LbOAuthManager
         this.pagePermissions = pagePermissions.entrySet().stream()
                 .filter(entry -> entry.getValue() != null)
                 .collect(toImmutableMap(entry -> entry.getKey().toUpperCase(ENGLISH), Map.Entry::getValue));
-        this.authorizationConfig = authorizationConfig;
+        this.authorizationConfig = authorizationConfiguration;
     }
 
     public String getUserIdField()
