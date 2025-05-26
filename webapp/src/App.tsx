@@ -35,15 +35,30 @@ function Screen() {
   useSwitchTheme()
   const access = useAccessStore();
   useEffect(() => {
-    const token = Cookies.get('token');
-    console.error("[App.tsx] Cookie token:", token);
+    const tokenChunks = [];
+    let index = 1;
 
-    if (token) {
-      access.updateToken(token);
+    while (true) {
+      const chunk = Cookies.get(`token_${index}`);
+      if (!chunk) {
+        break;
+      }
+      tokenChunks.push(chunk);
+      index++;
+    }
+
+    if (tokenChunks.length > 0) {
+      const fullToken = tokenChunks.join('');
+      console.error("[App.tsx] Reconstructed token:", fullToken);
+      access.updateToken(fullToken);
       console.error("[App.tsx] Token set via updateToken()");
-      Cookies.remove('token');
+
+      // Remove chunked cookies after use
+      for (let i = 1; i <= tokenChunks.length; i++) {
+        Cookies.remove(`token_${i}`);
+      }
     } else {
-      console.error("[App.tsx] No token found in cookies — likely login flow issue");
+      console.error("[App.tsx] No token chunk cookies found — likely login flow issue");
     }
   }, [])
   return (
