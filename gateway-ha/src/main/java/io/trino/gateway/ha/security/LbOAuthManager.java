@@ -66,7 +66,6 @@ public class LbOAuthManager
      */
     private final OAuthConfiguration oauthConfig;
     private final Map<String, String> pagePermissions;
-    private final AuthorizationConfiguration authorizationConfig;
 
     public LbOAuthManager(OAuthConfiguration configuration, Map<String, String> pagePermissions)
     {
@@ -125,7 +124,7 @@ public class LbOAuthManager
                 .map(map -> map.get(NONCE_CLAIM_NAME))
                 .filter(nonceInClaim -> nonceInClaim.asString().equals(hashNonce(nonce)));
         if (result.isEmpty()) {
-            log.error("Nonce claim mismatch for token: %s", idToken);
+            log.error("Invalid nonce");
             return buildUnauthorizedResponse();
         }
         log.debug("Successfully exchanged token for user (claims: %s)", getClaimsFromIdToken(idToken));

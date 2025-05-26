@@ -89,13 +89,7 @@ public class LoginResource
             @QueryParam("state") String state,
             @CookieParam(OIDC_COOKIE) Cookie cookie)
     {
-        log.error("OIDC callback invoked");
-        log.error("Received code: %s", code);
-        log.error("Received state: %s", state);
-        log.error("Received cookie: %s", cookie);
-
         if (oauthManager == null) {
-            log.error("OAuth configuration is not setup");
             throw new WebApplicationException("OAuth configuration is not setup");
         }
         if (cookie == null) {
@@ -104,17 +98,10 @@ public class LoginResource
         }
         Optional<String> cookieState = OidcCookie.getState(cookie);
         Optional<String> nonce = OidcCookie.getNonce(cookie);
-
-        log.error("Parsed cookie state: %s", cookieState);
-        log.error("Parsed cookie nonce: %s", nonce);
-
         if (cookieState.isEmpty() || !cookieState.orElseThrow().equals(state) || nonce.isEmpty()) {
             log.error("Invalid OIDC cookie");
             return buildUnauthorizedResponse();
         }
-
-        log.error("OIDC cookie validated successfully");
-
         return oauthManager.exchangeCodeForToken(code, nonce.orElseThrow(), "/");
     }
 
