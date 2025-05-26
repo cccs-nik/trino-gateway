@@ -54,7 +54,7 @@ function Screen() {
       console.error("[App.tsx] Token set via updateToken()");
 
       // Remove chunked cookies after use
-      for (let i = index; i <= tokenChunks.length; i++) {
+      for (let i = 0; i < tokenChunks.length; i++) {
         Cookies.remove(`token_${i}`);
       }
     } else {
