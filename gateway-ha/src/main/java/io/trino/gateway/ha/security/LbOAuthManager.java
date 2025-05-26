@@ -132,9 +132,10 @@ public class LbOAuthManager
             return buildUnauthorizedResponse();
         }
         log.error("Successfully exchanged token for user (claims: %s)", getClaimsFromIdToken(idToken));
+        List<NewCookie> tokenCookies = SessionCookie.getTokenCookies(idToken);
         return Response.status(FOUND)
                 .location(oauthConfig.getRedirectWebUrl().orElse(URI.create(redirectLocation)))
-                .cookie(SessionCookie.getTokenCookie(idToken))
+                .cookie(tokenCookies.toArray(new NewCookie[0]))
                 .cookie(OidcCookie.delete())
                 .build();
     }

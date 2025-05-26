@@ -59,8 +59,7 @@ public class LbFilter
         // Checks for cookie, if not find then search for authorization header
         try {
             String idToken = Optional
-                    .ofNullable(requestContext.getCookies().get(SessionCookie.OAUTH_ID_TOKEN))
-                    .map(Cookie::getValue)
+                    .ofNullable(SessionCookie.getTokenFromCookies(requestContext))
                     .orElse(getToken(requestContext.getHeaders().getFirst(HttpHeaders.AUTHORIZATION)));
 
             LbPrincipal principal = idTokenAuthenticator.authenticate(idToken)
