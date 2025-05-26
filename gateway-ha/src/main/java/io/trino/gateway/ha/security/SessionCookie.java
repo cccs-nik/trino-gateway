@@ -14,8 +14,17 @@
 package io.trino.gateway.ha.security;
 
 import io.airlift.log.Logger;
+import jakarta.ws.rs.container.ContainerRequestContext;
+import jakarta.ws.rs.core.Cookie;
 import jakarta.ws.rs.core.NewCookie;
 import jakarta.ws.rs.core.Response;
+
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 import static jakarta.ws.rs.core.NewCookie.SameSite.NONE;
 
@@ -63,7 +72,7 @@ public final class SessionCookie
 
         // Delete any extra cookies beyond chunkCount
         for (int i = chunkCount; i < MAX_CHUNKS_TO_CLEAN; i++) {
-            String cookieName = COOKIE_NAME_BASE + "_" + i;
+            String cookieName = OAUTH_ID_TOKEN + "_" + i;
             NewCookie deleteCookie = new NewCookie.Builder(cookieName)
                     .value("")
                     .path("/")
