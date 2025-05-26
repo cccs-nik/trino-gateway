@@ -92,7 +92,8 @@ public final class SessionCookie
                     try {
                         int index = Integer.parseInt(e.getKey().substring(prefix.length()));
                         return Map.entry(index, e.getValue().getValue());
-                    } catch (NumberFormatException ex) {
+                    }
+                    catch (NumberFormatException ex) {
                         return null;
                     }
                 })
