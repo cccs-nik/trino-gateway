@@ -49,9 +49,7 @@ function Screen() {
 
     if (tokenChunks.length > 0) {
       const fullToken = tokenChunks.join('');
-      console.error("[App.tsx] Reconstructed token:", fullToken);
       access.updateToken(fullToken);
-      console.error("[App.tsx] Token set via updateToken()");
 
       // Remove chunked cookies after use
       for (let i = 0; i < tokenChunks.length; i++) {

@@ -13,7 +13,6 @@
  */
 package io.trino.gateway.ha.security;
 
-import io.airlift.log.Logger;
 import jakarta.ws.rs.container.ContainerRequestContext;
 import jakarta.ws.rs.core.Cookie;
 import jakarta.ws.rs.core.NewCookie;
@@ -30,8 +29,6 @@ import static jakarta.ws.rs.core.NewCookie.SameSite.NONE;
 
 public final class SessionCookie
 {
-    private static final Logger log = Logger.get(SessionCookie.class);
-
     static final String OAUTH_ID_TOKEN = "token";
     static final String SELF_ISSUER_ID = "self";
     static final int MAX_COOKIE_CHUNK_SIZE = 3800;
@@ -51,10 +48,6 @@ public final class SessionCookie
             int end = Math.min(start + MAX_COOKIE_CHUNK_SIZE, tokenLength);
             String chunk = token.substring(start, end);
             String cookieName = OAUTH_ID_TOKEN + "_" + i;
-
-            log.error("Creating token chunk cookie — length = %d, begins with = %s",
-                    chunk.length(),
-                    chunk.substring(0, Math.min(chunk.length(), 20)));
 
             NewCookie cookie = new NewCookie.Builder(cookieName)
                     .value(chunk)
