@@ -30,7 +30,8 @@ public final class SessionCookie
 
     private SessionCookie() {}
 
-    public static List<NewCookie> getTokenCookies(String token) {
+    public static List<NewCookie> getTokenCookies(String token)
+    {
         List<NewCookie> cookies = new ArrayList<>();
         int tokenLength = token.length();
         int chunkCount = (int) Math.ceil((double) tokenLength / MAX_COOKIE_CHUNK_SIZE);
@@ -43,8 +44,8 @@ public final class SessionCookie
             String cookieName = OAUTH_ID_TOKEN + "_" + i;
 
             log.error("Creating token chunk cookie — length = %d, begins with = %s",
-                chunk.length(),
-                chunk.substring(0, Math.min(chunk.length(), 20)));
+                    chunk.length(),
+                    chunk.substring(0, Math.min(chunk.length(), 20)));
 
             NewCookie cookie = new NewCookie.Builder(cookieName)
                     .value(chunk)
@@ -79,13 +80,15 @@ public final class SessionCookie
         return cookies;
     }
 
-    public static String getTokenFromCookies(ContainerRequestContext requestContext) {
+    public static String getTokenFromCookies(ContainerRequestContext requestContext)
+    {
         Map<String, Cookie> cookies = requestContext.getCookies();
         final String prefix = OAUTH_ID_TOKEN + "_";
 
         List<Map.Entry<Integer, String>> chunks = cookies.entrySet().stream()
                 .filter(e -> e.getKey().startsWith(prefix))
-                .map(e -> {
+                .map(e ->
+                {
                     try {
                         int index = Integer.parseInt(e.getKey().substring(prefix.length()));
                         return Map.entry(index, e.getValue().getValue());
