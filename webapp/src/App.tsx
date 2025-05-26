@@ -36,7 +36,7 @@ function Screen() {
   const access = useAccessStore();
   useEffect(() => {
     const tokenChunks = [];
-    let index = 1;
+    let index = 0;
 
     while (true) {
       const chunk = Cookies.get(`token_${index}`);
