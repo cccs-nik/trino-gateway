@@ -37,6 +37,7 @@ import com.nimbusds.openid.connect.sdk.OIDCTokenResponseParser;
 import io.airlift.log.Logger;
 import io.trino.gateway.ha.config.OAuthConfiguration;
 import io.trino.gateway.ha.domain.Result;
+import jakarta.ws.rs.core.NewCookie;
 import jakarta.ws.rs.core.Response;
 
 import java.io.IOException;
@@ -126,9 +127,11 @@ public class LbOAuthManager
             log.error("Invalid nonce");
             return buildUnauthorizedResponse();
         }
+        log.debug("Successfully exchanged token for user (claims: %s)", getClaimsFromIdToken(idToken));
+        List<NewCookie> tokenCookies = SessionCookie.getTokenCookies(idToken);
         return Response.status(FOUND)
                 .location(oauthConfig.getRedirectWebUrl().orElse(URI.create(redirectLocation)))
-                .cookie(SessionCookie.getTokenCookie(idToken))
+                .cookie(tokenCookies.toArray(new NewCookie[0]))
                 .cookie(OidcCookie.delete())
                 .build();
     }

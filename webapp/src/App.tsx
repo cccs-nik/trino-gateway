@@ -35,10 +35,28 @@ function Screen() {
   useSwitchTheme()
   const access = useAccessStore();
   useEffect(() => {
-    const token = Cookies.get('token');
-    if (token) {
-      access.updateToken(token);
-      Cookies.remove('token');
+    const tokenChunks = [];
+    let index = 0;
+
+    while (true) {
+      const chunk = Cookies.get(`token_${index}`);
+      if (!chunk) {
+        break;
+      }
+      tokenChunks.push(chunk);
+      index++;
+    }
+
+    if (tokenChunks.length > 0) {
+      const fullToken = tokenChunks.join('');
+      access.updateToken(fullToken);
+
+      // Remove chunked cookies after use
+      for (let i = 0; i < tokenChunks.length; i++) {
+        Cookies.remove(`token_${i}`);
+      }
+    } else {
+      console.error("[App.tsx] No token chunk cookies found — likely login flow issue");
     }
   }, [])
   return (

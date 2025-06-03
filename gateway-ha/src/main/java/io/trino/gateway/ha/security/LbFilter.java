@@ -21,7 +21,6 @@ import jakarta.annotation.Priority;
 import jakarta.ws.rs.WebApplicationException;
 import jakarta.ws.rs.container.ContainerRequestContext;
 import jakarta.ws.rs.container.ContainerRequestFilter;
-import jakarta.ws.rs.core.Cookie;
 import jakarta.ws.rs.core.HttpHeaders;
 import jakarta.ws.rs.core.SecurityContext;
 
@@ -59,8 +58,7 @@ public class LbFilter
         // Checks for cookie, if not find then search for authorization header
         try {
             String idToken = Optional
-                    .ofNullable(requestContext.getCookies().get(SessionCookie.OAUTH_ID_TOKEN))
-                    .map(Cookie::getValue)
+                    .ofNullable(SessionCookie.getTokenFromCookies(requestContext))
                     .orElse(getToken(requestContext.getHeaders().getFirst(HttpHeaders.AUTHORIZATION)));
 
             LbPrincipal principal = idTokenAuthenticator.authenticate(idToken)
